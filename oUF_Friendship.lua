@@ -32,7 +32,7 @@ local function Update(self, event)
 			oUF_FriendshipCache[GetNPCID()] = {
 				standing = standing,
 				details = details,
-				name = UnitName('npc')
+				name = UnitName('npc'),
 
 				id = id, -- Temporary tracking
 			}
