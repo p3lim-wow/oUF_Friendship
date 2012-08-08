@@ -2,18 +2,30 @@ local _, ns = ...
 local oUF = ns.oUF or oUF
 assert(oUF, 'oUF Friendship was unable to locate oUF install')
 
--- This is not a final list, if you find an npc with reputation,
--- please let me (p3lim) know by PM/comment on the download site.
--- Will be generated properly if Wowhead adds filters for it.
+--[[
+ If you find an npc with reputation that is not shown,
+ please let me (p3lim) know by PM/comment on the download site.
+ The list is currently generated with the following:
+
+ for index = 1100, 1500 do
+	if(GetFriendshipReputationByID(index)) then
+		friendships[GetFactionInfoByID(index)] = index
+	end
+ end
+--]]
 local friendships = {
-	[GetFactionInfoByID(1278)] = 1278,
 	[GetFactionInfoByID(1273)] = 1273,
-	[GetFactionInfoByID(1282)] = 1282,
+	[GetFactionInfoByID(1275)] = 1275,
 	[GetFactionInfoByID(1276)] = 1276,
-	[GetFactionInfoByID(1358)] = 1358,
+	[GetFactionInfoByID(1277)] = 1277,
+	[GetFactionInfoByID(1278)] = 1278,
 	[GetFactionInfoByID(1279)] = 1279,
+	[GetFactionInfoByID(1280)] = 1280,
 	[GetFactionInfoByID(1281)] = 1281,
+	[GetFactionInfoByID(1282)] = 1282,
 	[GetFactionInfoByID(1283)] = 1283,
+	[GetFactionInfoByID(1357)] = 1357,
+	[GetFactionInfoByID(1358)] = 1358,
 }
 
 local function GetFriendshipID()
