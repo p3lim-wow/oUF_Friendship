@@ -24,11 +24,11 @@ local function GetFriendshipID()
 end
 
 local function OnEnter(self)
-	local _, cur, _, details = GetFriendshipReputationByID(GetFriendshipID())
+	local _, cur, _, details, _, standing, threshold = GetFriendshipReputationByID(GetFriendshipID())
 	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
 	GameTooltip:SetText(UnitName('target'), 1, 1, 1)
 	GameTooltip:AddLine(details, nil, nil, nil, true)
-	GameTooltip:AddLine(standing .. ' / 42999', 1, 1, 1, true)
+	GameTooltip:AddLine((cur - threshold) .. ' / 8400 (' .. standing .. ')', 1, 1, 1, true)
 	GameTooltip:Show()
 end
 
@@ -37,9 +37,9 @@ local function Update(self)
 	
 	local id = GetFriendshipID()
 	if(id) then
-		local _, cur = GetFriendshipReputationByID(id)
-		friendship:SetMinMaxValues(0, 42999)
-		friendship:SetValue(cur)
+		local _, cur, _, _, _, _, threshold = GetFriendshipReputationByID(id)
+		friendship:SetMinMaxValues(0, 8400)
+		friendship:SetValue(cur - threshold)
 		friendship:Show()
 	else
 		friendship:Hide()
