@@ -23,6 +23,47 @@ local function GetFriendshipID()
 	return friendships[UnitName('target')]
 end
 
+for tag, func in pairs({
+	['curfriendship'] = function()
+		local id = GetFriendshipID()
+		if(id) then
+			local _, cur, _, _, _, _, threshold = GetFriendshipReputationByID(id)
+			return cur - threshold
+		end
+	end,
+	['currawfriendship'] = function()
+		local id = GetFriendshipID()
+		if(id) then
+			local _, cur = GetFriendshipReputationByID(id)
+			return cur
+		end
+	end,
+	['perfriendship'] = function()
+		local id = GetFriendshipID()
+		if(id) then
+			local _, cur, _, _, _, _, threshold = GetFriendshipReputationByID(id)
+			return math.floor((cur - threshold) / 8400 * 100)
+		end
+	end,
+	['perfullfriendship'] = function()
+		local id = GetFriendshipID()
+		if(id) then
+			local _, cur = GetFriendshipReputationByID(id)
+			return math.floor(cur / 42999 * 100)
+		end
+	end,
+	['friendshipstanding'] = function()
+		local id = GetFriendshipID()
+		if(id) then
+			local _, _, _, _, _, standing = GetFriendshipReputationByID(id)
+			return standing
+		end
+	end,
+}) do
+	oUF.Tags.Methods[tag] = func
+	oUF.Tags.Events[tag] = 'PLAYER_TARGET_CHANGED'
+end
+
 local function OnEnter(self)
 	local _, cur, _, details, _, standing, threshold = GetFriendshipReputationByID(GetFriendshipID())
 	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
