@@ -4,6 +4,5 @@
 ## Title: oUF Friendship
 ## Notes: NPC Friendship Bar support for oUF layouts.
 ## RequiredDeps: oUF
-## SavedVariablesPerCharacter: oUF_FriendshipCache
 
 oUF_Friendship.lua

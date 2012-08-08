@@ -2,56 +2,51 @@ local _, ns = ...
 local oUF = ns.oUF or oUF
 assert(oUF, 'oUF Friendship was unable to locate oUF install')
 
-local function GetNPCID()
-	local GUID = UnitGUID('target') or ''
-	return tonumber(string.sub(GUID, -12, -9), 16)
+-- This is not a final list, if you find an npc with reputation,
+-- please let me (p3lim) know by PM/comment on the download site.
+-- Will be generated properly if Wowhead adds filters for it.
+local friendships = {
+	[GetFactionInfoByID(1278)] = 1278,
+	[GetFactionInfoByID(1273)] = 1273,
+	[GetFactionInfoByID(1282)] = 1282,
+	[GetFactionInfoByID(1276)] = 1276,
+	[GetFactionInfoByID(1358)] = 1358,
+	[GetFactionInfoByID(1279)] = 1279,
+	[GetFactionInfoByID(1281)] = 1281,
+	[GetFactionInfoByID(1283)] = 1283,
+}
+
+local function GetFriendshipID()
+	if(not UnitExists('target')) then return end
+	if(UnitIsPlayer('target')) then return end
+
+	return friendships[UnitName('target')]
 end
 
 local function OnEnter(self)
-	local cache = oUF_FriendshipCache[GetNPCID()]
+	local _, cur, _, details = GetFriendshipReputationByID(GetFriendshipID())
 	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
-	GameTooltip:SetText(cache.name, 1, 1, 1)
-	GameTooltip:AddLine(cache.details, nil, nil, nil, true)
-	GameTooltip:AddLine(cache.standing .. ' / 42999', 1, 1, 1, true)
+	GameTooltip:SetText(UnitName('target'), 1, 1, 1)
+	GameTooltip:AddLine(details, nil, nil, nil, true)
+	GameTooltip:AddLine(standing .. ' / 42999', 1, 1, 1, true)
 	GameTooltip:Show()
 end
 
-local function Update(self, event)
-	if(not UnitExists('target')) then return end
-	local _, standing, details, id -- 'id' is temporary
-
-	local cache = oUF_FriendshipCache[GetNPCID()]
-	if(event == 'GOSSIP_SHOW') then
-		id, standing, _, details = GetFriendshipReputation()
-		if(not id) then return end
-
-		if(cache) then
-			cache.standing = standing
-			cache.details = details -- Not sure if this ever changes
-		else
-			oUF_FriendshipCache[GetNPCID()] = {
-				standing = standing,
-				details = details,
-				name = UnitName('npc'),
-
-				id = id, -- Temporary tracking
-			}
-		end
-	elseif(cache) then
-		standing = cache.standing
-	end
-
+local function Update(self)
 	local friendship = self.Friendship
-	if(standing ~= nil) then
-		friendship:SetMinMaxValues(0, 42999) -- Max value doesn't seem to change
-		friendship:SetValue(standing)
+	
+	local id = GetFriendshipID()
+	if(id) then
+		local _, cur = GetFriendshipReputationByID(id)
+		friendship:SetMinMaxValues(0, 42999)
+		friendship:SetValue(cur)
 		friendship:Show()
 	else
 		friendship:Hide()
 	end
 
 	if(friendship.PostUpdate) then
-		return friendship:PostUpdate(standing)
+		return friendship:PostUpdate(id)
 	end
 end
 
@@ -69,7 +64,6 @@ local function Enable(self, unit)
 		friendship.__owner = self
 		friendship.ForceUpdate = ForceUpdate
 
-		self:RegisterEvent('GOSSIP_SHOW', Path)
 		self:RegisterEvent('PLAYER_TARGET_CHANGED', Path)
 
 		if(friendship.Tooltip) then
@@ -77,8 +71,6 @@ local function Enable(self, unit)
 			friendship:HookScript('OnEnter', OnEnter)
 			friendship:HookScript('OnLeave', GameTooltip_Hide)
 		end
-
-		oUF_FriendshipCache = oUF_FriendshipCache or {}
 
 		if(not friendship:GetStatusBarTexture()) then
 			friendship:SetStatusBarTexture([=[Interface\TargetingFrame\UI-StatusBar]=])
@@ -90,7 +82,6 @@ end
 
 local function Disable(self)
 	if(self.Friendship) then
-		self:UnregisterEvent('GOSSIP_SHOW', Path)
 		self:UnregisterEvent('PLAYER_TARGET_CHANGED', Path)
 	end
 end
